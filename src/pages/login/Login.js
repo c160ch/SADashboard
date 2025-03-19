@@ -13,16 +13,16 @@ import {
 } from "reactstrap";
 import Widget from "../../components/Widget/Widget";
 import Footer from "../../components/Footer/Footer";
-import { loginUser } from "../../actions/auth";
+//import { loginUser, signInWithPopup, auth } from "../../actions/auth";
+import {loginUser, provider,successLogin,loginError} from "../../actions/auth.js";
+import {auth} from "../../actions/register.js";
 import hasToken from "../../services/authService";
 
 import loginImage from "../../assets/loginImage.svg";
-import SofiaLogo from "../../components/Icons/SofiaLogo.js";
 import GoogleIcon from "../../components/Icons/AuthIcons/GoogleIcon.js";
-import TwitterIcon from "../../components/Icons/AuthIcons/TwitterIcon.js";
-import FacebookIcon from "../../components/Icons/AuthIcons/FacebookIcon.js";
-import GithubIcon from "../../components/Icons/AuthIcons/GithubIcon.js";
-import LinkedinIcon from "../../components/Icons/AuthIcons/LinkedinIcon.js";
+import { GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+
+
 
 const Login = (props) => {
 
@@ -33,15 +33,62 @@ const Login = (props) => {
 
   const doLogin = (e) => {
     e.preventDefault();
-    props.dispatch(loginUser({ password: state.password, email: state.email }))
+	console.log("the userpassword",state.email, state.password);
+    props.dispatch(loginUser({ password: state.password, email: state.email }));
   }
+  
 
   const changeCreds = (event) => {
     setState({ ...state, [event.target.name]: event.target.value })
   }
+  
+    const doGoogleLogin=(event)=>{
+	  console.log("do Google login");
+	  
+	console.log("login with google");
+  signInWithPopup(auth, provider)
+  .then((result) => {
+    // This gives you a Google Access Token. You can use it to access the Google API.
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential.accessToken;
+    // The signed-in user info.
+    const user = result.user;
+    // IdP data available using getAdditionalUserInfo(result)
+    // ...
+	console.log("doGoogleLogin  is the user=>",user, token);
+       localStorage.setItem('authenticated', true);
+	   props.dispatch(successLogin());
+	   //store the token
+//	   triggerRerender();
+	
+  }).catch((error) => {
+    // Handle Errors here.
+    const errorCode = error.code;
+    const errorMessage = error.message;
+    // The email of the user's account used.
+    const email = error.customData.email;
+    // The AuthCredential type that was used.
+    const credential = GoogleAuthProvider.credentialFromError(error);
+			localStorage.setItem('authenticated', false);
+		localStorage.setItem('errorMessage', "No user and password");
+    props.dispatch(loginError('Something was wrong. Try again'));
+//	  toast.error(`Email and password can not be blank`);
+
+    // ...
+  });
+
+	  
+//	  loginWGoogle(auth,provider);
+	  
+  }
+  
+  const doAA=(event)=>{
+	  console.log("Do AA");
+  }
 
   const { from } = props.location.state || { from: { pathname: '/template' }};
   if (hasToken(JSON.parse(localStorage.getItem('authenticated')))) {
+    console.log("this is from",from);
     return (
       <Redirect to={from} />
     )
@@ -55,10 +102,6 @@ const Login = (props) => {
             <Widget className="widget-auth widget-p-lg">
               <div className="d-flex align-items-center justify-content-between py-3">
                 <p className="auth-header mb-0">Login</p>
-                <div className="logo-block">
-                  <SofiaLogo />
-                  <p className="mb-0">SOFIA</p>
-                </div>
               </div>
               <div className="auth-info my-2">
                 <p>This is a real app with Node.js backend - use <b>"admin@flatlogic.com / password"</b> to login!</p>
@@ -100,11 +143,7 @@ const Login = (props) => {
                 <div className="d-flex align-items-center my-3">
                   <p className="social-label mb-0">Login with</p>
                   <div className="socials">
-                    <a href="https://flatlogic.com/"><GoogleIcon /></a>
-                    <a href="https://flatlogic.com/"><TwitterIcon /></a>
-                    <a href="https://flatlogic.com/"><FacebookIcon /></a>
-                    <a href="https://flatlogic.com/"><GithubIcon /></a>
-                    <a href="https://flatlogic.com/"><LinkedinIcon /></a>
+                    <a href="#" onClick={(event =>doGoogleLogin(event))}><GoogleIcon /></a>
                   </div>
                 </div>
                 <Link to="/register">Don’t have an account? Sign Up here</Link>

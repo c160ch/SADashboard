@@ -27,6 +27,7 @@ import "./styles/app.scss";
 const PrivateRoute = ({ dispatch, component, ...rest }) => {
   if (!isAuthenticated(JSON.parse(localStorage.getItem("authenticated")))) {
     dispatch(logoutUser());
+	console.log("logout from APP");
     return (<Redirect to="/login" />)
   } else {
     return (
@@ -38,10 +39,20 @@ const PrivateRoute = ({ dispatch, component, ...rest }) => {
 const App = (props) => {
   return (
     <div>
-      <ToastContainer/>
+      <ToastContainer
+	  position="top-center"
+autoClose={true}
+newestOnTop={false}
+closeOnClick={false}
+rtl={false}
+pauseOnFocusLoss
+draggable={false}
+theme="colored"
+
+	  />
       <HashRouter>
         <Switch>
-          <Route path="/" exact render={() => <Redirect to="/template/dashboard" />} />
+          <Route path="/" exact render={() => <Redirect to="/login" />} />
           <Route path="/template" exact render={() => <Redirect to="/template/dashboard"/>}/>
           <PrivateRoute path="/template" dispatch={props.dispatch} component={LayoutComponent} />
           <Route path="/login" exact component={Login} />
