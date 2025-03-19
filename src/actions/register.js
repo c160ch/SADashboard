@@ -9,16 +9,14 @@ import {loginUser} from "./auth.js";
 export const REGISTER_REQUEST = 'REGISTER_REQUEST';
 export const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
 export const REGISTER_FAILURE = 'REGISTER_FAILURE';
-//https://scoutingangels-916bf.europe-west9.firebaseio.com/
-//https://scoutingangels-916bf-default-rtdb.firebaseio.com/) 
 export const firebaseConfig = {
-  apiKey: "AIzaSyCwU8zKCsuv9J7-bijkjhRuMb6P9jJBME8",
-  authDomain: "scoutingangels-916bf.firebaseapp.com",
-  projectId: "scoutingangels-916bf",
-  storageBucket: "scoutingangels-916bf.firebasestorage.app",
-  messagingSenderId: "222807938229",
-  appId: "1:222807938229:web:91587c9580c0daa46b5afc",
-  measurementId: "G-K730L7C4J8"
+  apiKey: process.env.API_KEY,
+  authDomain: process.env.AUTH_DOMAIN,
+  projectId: process.env.PROJECT_ID,
+  storageBucket: process.env.STORAGE_BUCKET,
+  messagingSenderId: process.env.MESSAGING_SENDER_ID,
+  appId: process.env.APP_ID,
+  measurementId: process.env.MEASUREMENT_ID
 
 };
 
