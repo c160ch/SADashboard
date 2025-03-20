@@ -27,7 +27,7 @@ import { GoogleAuthProvider, signInWithPopup} from "firebase/auth";
 const Login = (props) => {
 
   const [state, setState] = useState({
-    email: 'admin@flatlogic.com',
+    email: 'admin@example.com',
     password: 'password',
   })
 
@@ -102,9 +102,6 @@ const Login = (props) => {
             <Widget className="widget-auth widget-p-lg">
               <div className="d-flex align-items-center justify-content-between py-3">
                 <p className="auth-header mb-0">Login</p>
-              </div>
-              <div className="auth-info my-2">
-                <p>This is a real app with Node.js backend - use <b>"admin@flatlogic.com / password"</b> to login!</p>
               </div>
               <form onSubmit={(event) => doLogin(event)}>
                 <FormGroup className="my-3">

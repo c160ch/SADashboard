@@ -41,7 +41,7 @@ const App = (props) => {
     <div>
       <ToastContainer
 	  position="top-center"
-autoClose={true}
+autoClose={60000}
 newestOnTop={false}
 closeOnClick={false}
 rtl={false}
