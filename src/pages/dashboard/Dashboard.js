@@ -24,7 +24,7 @@ import heartRed from "../../assets/dashboard/heartRed.svg";
 import heartYellow from "../../assets/dashboard/heartYellow.svg";
 import s from "./Dashboard.module.scss";
 import { getDatabase,ref,set,get, child } from "firebase/database";
-import { doc, collection, query, where, getDocs , getFirestore, orderBy, limit, startAt, getDoc} from "firebase/firestore";
+import { doc, collection, query, where, getDocs , getFirestore, orderBy, limit, startAt, getDoc,startAfter} from "firebase/firestore";
 import {db} from "../../actions/register.js";
 import moreIcon from "../../assets/tables/moreIcon.svg";
 import mock from "../tables/mock.js";
@@ -40,7 +40,7 @@ const Dashboard = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
 //  const meals = [meal1, meal2, meal3];
-  const pageSize = 4;
+  const pageSize = 2;
   const targetStartup = 1000;
   const targetFundingGoal = 100000000;
 
@@ -117,7 +117,7 @@ const Dashboard = () => {
 		if(fetched.length >0){
 			setCurrentFirstDoc(fetched[0]);
 			setCurrentLastDoc(fetched[fetched.length-1]);
-			setFetchedData(fetchedData=>[...fetchedData, fetched]); 
+			setFetchedData(fetchedData=>[...fetchedData, ...fetched]); 
 		}	
 		 
 
@@ -131,36 +131,64 @@ const Dashboard = () => {
     setTableMenuOpen(!tableDropdownOpen);
   }
 	
-  const setSecondTablePage = (e, index,preIndex) => {
+  const setSecondTablePage = async (e, index,preIndex) => {
     e.preventDefault();
     setSecondTableCurrentPage(index);
 	
-	console.log("currentPage", index, preIndex);
+	console.log("currentPage==>", index, preIndex);
 	
 	if(index > preIndex){
+		// current page should be index+1
 		// adding page
 		console.log("loading new data if fetchedData doesnt have");
 		
-		if(fetchedData.length >= index*pageSize){
-			// read from fetchedData
+		if(fetchedData.length >= (index)*pageSize){
+			// read from fetchedData... probably second time load oredi
 			let content = [];
 			console.log(" loading from fetchedData");
-			content=[...content, fetchedData.slice((index-1)*pageSize,(index)*pageSize)];
+			for(let i = 0;i<pageSize;i++){
+				content=[...content, fetchedData[index*pageSize].data()]; //wrong content should be .data()
+			}	
 		}else{
 			// loading from DB
+			var fetched =[]
 			console.log("loading from DB");
+			const next = query(collection(db, "calls"),
+            orderBy("Time","desc"),
+            startAfter(currentLastDoc),
+            limit(pageSize+1));
+			var nextCalls=[];
+			await getDocs(next).then(
+            querySnapshot=>{
+                querySnapshot.forEach((doc) => {
+                nextCalls = [...nextCalls, doc.data()];
+                const dd = doc.data();
+                fetched = [...fetched, doc];
+                });
+            }
+            );
+
+	     	if(fetched.length >0){
+                setStartupData(nextCalls);
+			    setCurrentFirstDoc(fetched[0]);
+			    setCurrentLastDoc(fetched[fetched.length-1]);
+			    setFetchedData(fetchedData=>[...fetchedData, ...fetched]); 
+		    }	
 		}
 	}else{
 		// lesser page
 		if(index*pageSize<=fetchedData.length+1){
 			let content = [];
 			let member=0;
-			for (let i = (index-1)*pageSize; i < index*4; i++) {
-				
-				content=[...content, fetchedData[i].doc];
-				console.log("looping -->",i, content[member]);
+			for (let i = (index)*pageSize; i <= ((index)*pageSize)+pageSize; i++) {
+				console.log("This is the i=>",i);
+				console.log("This is the fetchedData=>",fetchedData);
+				console.log("This is the fetchedData[i]=>",fetchedData[i]);
+				console.log("This is the fetchedData[i].data=>",fetchedData[i].data());
+				content=[...content, fetchedData[i].data()];  //
+				console.log("looping -->",i, content[i]);
             }
-			setStartupData(content);
+			//setStartupData(content); //should not change
 		}else{
 			// something wrong . needs to reload
 			console.log("Warning should not happen ", index*pageSize, fetchedData.length+1);
@@ -178,9 +206,9 @@ const Dashboard = () => {
   }
   
   useEffect(() => {
-	  console.log("load once");
-//    loadCalls(1);
-	  loadSummary(1);
+	console.log("load once");
+    loadCalls(1);
+    loadSummary(1);
   }, []);
   
   
@@ -241,12 +269,12 @@ const Dashboard = () => {
                         </td>
 						<td>{item.Customer}</td>
                         <td>{item.Time.toDate().toLocaleDateString("en-GB")}</td>
-                        <td>{item.title}</td>
-                        <td>{item.description}</td>
-                        <td>{item.points}</td>
-                        <td>{item.strategies}</td>
-                        <td>{item.amount}</td>
-						<td>{item.additional}</td>
+                        <td>{item.Title}</td>
+                        <td>{item.Description}</td>
+                        <td>{item.Points}</td>
+                        <td>{item.Strategies}</td>
+                        <td>{item.Amount}</td>
+						<td>{item.Additional}</td>
 						<td>{item.Summary}</td>
                         <td></td>
                       </tr>
@@ -268,7 +296,7 @@ const Dashboard = () => {
                         </PaginationLink>
                       </PaginationItem>
                     )}
-                    <PaginationItem disabled={secondTableCurrentPage >= 4 - 1}>
+                    <PaginationItem disabled={fetchedData.length <= (secondTableCurrentPage+1)*pageSize}>
                       <PaginationLink
                         onClick={e => setSecondTablePage(e, secondTableCurrentPage + 1, secondTableCurrentPage)}
                         next
