@@ -69,31 +69,38 @@ const Header = (props) => {
   
   const [name, setName] = useState("No name");
   
+  const [profileURL,setProfileURL]=useState("");
+  
   const getUser=()=>{
 	  console.log("this is the auth=>",auth);
 	  
-	  if(auth===null){
-		  console.log(" auth is null:");
-		  //should redirect
-	  }else{
-		  if(auth.currentUser===null){
-			  console.log(" current user is  null: remain No name");
-			  // should redirect
-		  }else{
-			  if(auth.currentUser.displayName===null){
-				  console.log(" displayName user is  null:");
-				  if(auth.currentUser.email===null){
-					  console.log("email is  null:");
-					  
-				  }else{
-					  setName(auth.currentUser.email);
-				  }
-			  }else{
-				  console.log("displaying displayName",auth.currentName.displayName);
-				  setName(auth.currentName.displayName);
-			  }
-		  }
-	  }
+        const user = auth.currentUser;
+
+        if (user) {
+  // User is signed in, see docs for a list of available properties
+  // https://firebase.google.com/docs/reference/js/auth.user
+  // ...
+             const displayName = user.displayName;
+			 const email = user.email;
+             const photoURL = user.photoURL;
+             const emailVerified = user.emailVerified;
+			 
+			 console.log("user =>", displayName,email,photoURL,emailVerified);
+			 
+			 if(displayName){
+				 setName(displayName);
+			 }else{
+				 setName(email);
+			 }
+			 
+			 if(photoURL){
+				 console.log("setting profileURL ",photoURL);
+				 setProfileURL(photoURL);
+			 }
+			 
+        } else {
+  // No user is signed in. stays No name
+        }
   }
   
    useEffect(() => {
@@ -126,7 +133,7 @@ const Header = (props) => {
         <Dropdown isOpen={notificationsOpen} toggle={() => toggleNotifications()} nav id="basic-nav-dropdown" className="ml-3">
           <DropdownToggle nav caret className="navbar-dropdown-toggle">
             <span className={`${s.avatar} rounded-circle float-left mr-2`}>
-              <img src={gymIcon} alt="User"/>
+              <img src={profileURL===""?gymIcon:profileURL} alt="User"/>
             </span>
             <span className="small d-none d-sm-block ml-1 mr-2 body-1">{name}</span>
           </DropdownToggle>
