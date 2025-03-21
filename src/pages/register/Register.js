@@ -40,9 +40,6 @@ const Register = (props) => {
   
   const [forceRender, setForceRender] = useState(0);
   
-  const triggerRerender = () => {
-  setForceRender((prev) => prev + 1); // Updating state forces a re-render
-  };
   
   const doGoogleLogin=(event)=>{
 	  console.log("do Google login");
@@ -61,7 +58,6 @@ const Register = (props) => {
        localStorage.setItem('authenticated', true);
 	   props.dispatch(successLogin());
 	   //store the token
-//	   triggerRerender();
 	
   }).catch((error) => {
     // Handle Errors here.
@@ -78,12 +74,7 @@ const Register = (props) => {
 
     // ...
   });
-
-	  
-//	  loginWGoogle(auth,provider);
-	  
   }
-	  
   
 
   const { from } = props.location.state || { from: { pathname: '/template' } }
