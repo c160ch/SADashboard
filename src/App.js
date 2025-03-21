@@ -11,6 +11,9 @@ import LayoutComponent from "./components/Layout/Layout";
 import ErrorPage from "./pages/error/ErrorPage";
 import Login from "./pages/login/Login";
 import Register from "./pages/register/Register";
+import TermsPage from "./pages/terms/TermsPage";
+import PrivacyPage from "./pages/privacy/PrivacyPage";
+import DisclaimerPage from "./pages/disclaimer/DisclaimerPage";
 
 // -- Redux Actions
 import { logoutUser } from "./actions/auth";
@@ -23,6 +26,14 @@ import isAuthenticated from "./services/authService";
 
 // -- Component Styles
 import "./styles/app.scss";
+
+import {Elements} from '@stripe/react-stripe-js';
+import {loadStripe} from '@stripe/stripe-js';
+
+// Make sure to call `loadStripe` outside of a component’s render to avoid
+// recreating the `Stripe` object on every render.
+const stripePromise = loadStripe('pk_test_iO0OmHJjHiksR0HjyoUOSMNS0017Q3B9xA');
+
 
 const PrivateRoute = ({ dispatch, component, ...rest }) => {
   if (!isAuthenticated(JSON.parse(localStorage.getItem("authenticated")))) {
@@ -37,6 +48,12 @@ const PrivateRoute = ({ dispatch, component, ...rest }) => {
 };
 
 const App = (props) => {
+	
+	const options = {
+    // passing the client secret obtained from the server
+    clientSecret: '{{REACT_APP_CLIENT_SECRET}}',
+  };
+	
   return (
     <div>
       <ToastContainer
@@ -58,6 +75,9 @@ theme="colored"
           <Route path="/login" exact component={Login} />
           <Route path="/error" exact component={ErrorPage} />
           <Route path="/register" exact component={Register} />
+		  <Route path="/terms" exact component={TermsPage} />
+		  <Route path="/privacy" exact component={PrivacyPage} />
+		  <Route path="/disclaimer" exact component={DisclaimerPage} />
           <Route component={ErrorPage}/>
           <Route path='*' exact={true} render={() => <Redirect to="/error" />} />
         </Switch>
