@@ -100,9 +100,6 @@ const Register = (props) => {
                   <p className="mb-0">Scouting angels</p>
                 </div>
               </div>
-              <div className="auth-info my-2">
-                <p>This is a real app with Node.js backend - use <b>"admin@flatlogic.com / password"</b> to login!</p>
-              </div>
               <form onSubmit={(event => doRegister(event))}>
                 <FormGroup className="my-3">
                   <FormText>Email</FormText>
