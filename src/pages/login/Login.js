@@ -21,7 +21,31 @@ import hasToken from "../../services/authService";
 import loginImage from "../../assets/loginImage.svg";
 import GoogleIcon from "../../components/Icons/AuthIcons/GoogleIcon.js";
 import { GoogleAuthProvider, signInWithPopup} from "firebase/auth";
+import { useEffect } from 'react';
 
+export function AutomaticallWidget() {
+    useEffect(() => {
+        const script = document.createElement('script');
+        script.src = "https://widget.automaticall.io/widget.iife.js";
+        script.async = true;
+        script.onload = () => {
+            if (typeof window !== 'undefined' && window.AutomaticallWidget) {
+                window.AutomaticallWidget.init({
+                    variant: 'light',
+                    id: '149',
+                    position: 'bottom-right'
+                });
+            }
+        };
+        document.body.appendChild(script);
+        
+        return () => {
+            document.body.removeChild(script);
+        };
+    }, []);
+
+    return null;
+}
 
 
 const Login = (props) => {
@@ -120,7 +144,7 @@ const Login = (props) => {
                 <FormGroup  className="my-3">
                   <div className="d-flex justify-content-between">
                     <FormText>Password</FormText>
-                    <Link to="/error">Forgot password?</Link>
+                    <Link to="/forget">Forgot password?</Link>
                   </div>
                   <Input
                     id="password"
